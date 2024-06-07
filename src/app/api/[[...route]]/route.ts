@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { handle } from "hono/vercel"
+import accounts from "./accounts";
 
 export const runtime = "edge";
 
@@ -26,8 +27,21 @@ app
 // generics
 // app.routes("/foo", handleFoo (inside another file))
 
+// this is one way we can do it if we DO NOT want to create an rpc
+// meaning we do not care about typesafety from api to frontend
+//app.route("/accounts", accounts);
+// To create RPC we need to chain together the routes to the app var
+const routes = app
+    .route("/accounts", accounts);
+
+
 // this overwrites the nextjs api route conventions allowing us to keep all routes
 // in this one file instead of file based routing with default nextjs
 export const GET = handle(app);
 export const POST = handle(app);
+// this is how we create an RPC (typesafety front to back)
+// now the AppType is the type of the app WITH the chained routes
+// BUT we also need to CHAIN the routes to the app class from Hono, instantiate
+// and add methods all in 1 line
+export type AppType = typeof routes;
 
