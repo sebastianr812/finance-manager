@@ -40,6 +40,7 @@ const routes = app
 // in this one file instead of file based routing with default nextjs
 export const GET = handle(app);
 export const POST = handle(app);
+export const PATCH = handle(app);
 // this is how we create an RPC (typesafety front to back)
 // now the AppType is the type of the app WITH the chained routes
 // BUT we also need to CHAIN the routes to the app class from Hono, instantiate
