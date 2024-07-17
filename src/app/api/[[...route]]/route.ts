@@ -1,7 +1,8 @@
 import { Hono } from "hono"
 import { handle } from "hono/vercel"
 import accounts from "./accounts";
-import { HTTPException } from "hono/http-exception";
+import categories from "./categories";
+import transactions from "./transactions";
 
 export const runtime = "edge";
 
@@ -33,7 +34,9 @@ app
 //app.route("/accounts", accounts);
 // To create RPC we need to chain together the routes to the app var
 const routes = app
-    .route("/accounts", accounts);
+    .route("/accounts", accounts)
+    .route("/categories", categories)
+    .route("/transactions", transactions);
 
 
 // this overwrites the nextjs api route conventions allowing us to keep all routes
@@ -41,6 +44,7 @@ const routes = app
 export const GET = handle(app);
 export const POST = handle(app);
 export const PATCH = handle(app);
+export const DELETE = handle(app);
 // this is how we create an RPC (typesafety front to back)
 // now the AppType is the type of the app WITH the chained routes
 // BUT we also need to CHAIN the routes to the app class from Hono, instantiate

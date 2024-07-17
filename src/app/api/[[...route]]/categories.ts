@@ -1,21 +1,12 @@
 import { db } from "@/db/drizzle";
 import { createId } from "@paralleldrive/cuid2";
-import { accounts, insertAccountSchema } from "@/db/schema";
+import { categories, insertCategorySchema } from "@/db/schema";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { and, eq, inArray } from "drizzle-orm";
 import * as z from "zod";
 
-// const app = new Hono();
-
-// REGULAR HONO API
-//    app.get("/", (c) => {
-//        return c.json({ accounts: [] });
-//    });
-//
-//  RPC ALLOWS US TO GET END TO END TYPESAFETY WITH REACT QUERY
-//  WE CAN KNOW EXACTLY WHAT TYPE TO EXPECT FROM BACKEND
 const app = new Hono()
     .get(
         "/",
@@ -29,12 +20,11 @@ const app = new Hono()
 
             const data = await db
                 .select({
-                    id: accounts.id,
-                    name: accounts.name
+                    id: categories.id,
+                    name: categories.name
                 })
-                .from(accounts)
-                .where(eq(accounts.userId, auth.userId));
-
+                .from(categories)
+                .where(eq(categories.userId, auth.userId));
 
             return c.json({ data });
         })
@@ -59,14 +49,14 @@ const app = new Hono()
 
             const [data] = await db
                 .select({
-                    id: accounts.id,
-                    name: accounts.name
+                    id: categories.id,
+                    name: categories.name
                 })
-                .from(accounts)
+                .from(categories)
                 .where(
                     and(
-                        eq(accounts.userId, auth.userId),
-                        eq(accounts.id, id)
+                        eq(categories.userId, auth.userId),
+                        eq(categories.id, id)
                     )
                 )
             if (!data) {
@@ -77,14 +67,10 @@ const app = new Hono()
         }
 
     )
-    // we need to validate what kind of json this post req can accept so we
-    // chain middlewares - we created the generic schema and then refined it,
-    // we ONLY want the name field to come over the wire, everything else will
-    // be inserted from the server (id, userId, plaidId, sensitive info etc)
     .post(
         "/",
         clerkMiddleware(),
-        zValidator("json", insertAccountSchema.pick({
+        zValidator("json", insertCategorySchema.pick({
             name: true,
         })),
         async (c) => {
@@ -97,7 +83,7 @@ const app = new Hono()
 
             // select by default returns array of objs from db
             // but insert we need to manually tell it to return - good practice -
-            const [data] = await db.insert(accounts).values({
+            const [data] = await db.insert(categories).values({
                 id: createId(),
                 userId: auth.userId,
                 ...values,
@@ -122,15 +108,15 @@ const app = new Hono()
             }
 
             const data = await db
-                .delete(accounts)
+                .delete(categories)
                 .where(
                     and(
-                        eq(accounts.userId, auth.userId),
-                        inArray(accounts.id, values.ids)
+                        eq(categories.userId, auth.userId),
+                        inArray(categories.id, values.ids)
                     )
                 )
                 .returning({
-                    id: accounts.id
+                    id: categories.id
                 });
 
 
@@ -143,7 +129,7 @@ const app = new Hono()
         zValidator("param", z.object({
             id: z.string().optional(),
         })),
-        zValidator("json", insertAccountSchema.pick({
+        zValidator("json", insertCategorySchema.pick({
             name: true
         })),
         async (c) => {
@@ -160,12 +146,12 @@ const app = new Hono()
             }
 
             const [data] = await db
-                .update(accounts)
+                .update(categories)
                 .set(values)
                 .where(
                     and(
-                        eq(accounts.userId, auth.userId),
-                        eq(accounts.id, id),
+                        eq(categories.userId, auth.userId),
+                        eq(categories.id, id),
                     )
                 )
                 .returning();
@@ -196,15 +182,15 @@ const app = new Hono()
             }
 
             const [data] = await db
-                .delete(accounts)
+                .delete(categories)
                 .where(
                     and(
-                        eq(accounts.userId, auth.userId),
-                        eq(accounts.id, id),
+                        eq(categories.userId, auth.userId),
+                        eq(categories.id, id),
                     )
                 )
                 .returning({
-                    id: accounts.id
+                    id: categories.id
                 });
 
             if (!data) {
