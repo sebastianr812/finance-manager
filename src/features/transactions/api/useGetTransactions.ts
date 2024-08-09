@@ -1,4 +1,6 @@
+import { transactions } from "@/db/schema";
 import { client } from "@/lib/hono";
+import { convertAmountFromMiliunits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 
@@ -25,7 +27,15 @@ export function useGetTransactions() {
             }
 
             const { data } = await res.json();
-            return data;
+            // this allows all of front end api hooks to become formatted
+            // instead of having to call a func on the front end every time
+            // to convert api data to front end data
+            // this is our MIDDLE layer so we do it here and the entire front
+            // end has the correct data foramt
+            return data.map((transaction) => ({
+                ...transaction,
+                amount: convertAmountFromMiliunits(transaction.amount)
+            }))
         },
     });
     return query;

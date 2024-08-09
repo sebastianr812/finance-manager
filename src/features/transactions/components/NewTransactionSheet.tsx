@@ -39,9 +39,9 @@ export const NewTransactionSheet = () => {
     const accountMutation = useCreateAccount();
     const onCreateAccount = (name: string) => accountMutation.mutate({ name });
 
-    const accountOptions = (accountQuery.data ?? []).map((cat) => ({
-        label: cat.name,
-        value: cat.id,
+    const accountOptions = (accountQuery.data ?? []).map((acc) => ({
+        label: acc.name,
+        value: acc.id,
     }));
 
     const onSubmit = (values: FormValues) => {

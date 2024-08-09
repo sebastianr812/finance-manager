@@ -152,11 +152,6 @@ const app = new Hono()
                 )
                 .returning()
 
-            if (!data) {
-                return c.json({
-                    error: "could not bulk create"
-                });
-            }
             return c.json({ data });
         }
     )

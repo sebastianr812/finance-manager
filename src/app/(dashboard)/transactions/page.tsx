@@ -10,20 +10,20 @@ import {
 import { Loader2, Plus } from "lucide-react";
 import { columns } from "./columns"
 import { DataTable } from "@/components/data-table";
-import { useGetAccounts } from "@/features/accounts/api/useGetAccounts";
+import { useGetTransactions } from "@/features/transactions/api/useGetTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useBulkDeleteAccounts } from "@/features/accounts/api/useBulkDeleteAccounts";
 import { useNewTransaction } from "@/features/transactions/hooks/useNewTransaction";
+import { useBulkDeleteTransactions } from "@/features/transactions/api/useBulkDeleteTransactions";
 
 export default function TransactionsPage() {
     const newTransactionModal = useNewTransaction();
-    const deleteAccounts = useBulkDeleteAccounts();
-    const accountsQuery = useGetAccounts();
-    const accounts = accountsQuery.data || [];
+    const deleteTransactions = useBulkDeleteTransactions();
+    const transactionsQuery = useGetTransactions();
+    const transactions = transactionsQuery.data || [];
 
-    const isDisabled = deleteAccounts.isPending || accountsQuery.isLoading;
+    const isDisabled = deleteTransactions.isPending || transactionsQuery.isLoading;
 
-    if (accountsQuery.isLoading) {
+    if (transactionsQuery.isLoading) {
         return (
             <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
                 <Card className="border-none drop-shadow-sm">
@@ -59,12 +59,12 @@ export default function TransactionsPage() {
                         disabled={isDisabled}
                         onDelete={(row) => {
                             const ids = row.map((r) => r.original.id);
-                            deleteAccounts.mutate({ ids });
+                            deleteTransactions.mutate({ ids });
 
                         }}
-                        filterKey="name"
+                        filterKey="payee"
                         columns={columns}
-                        data={accounts} />
+                        data={transactions} />
                 </CardContent>
             </Card>
         </div>

@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Select } from "@/components/Select";
 import { DatePicker } from "@/components/DatePicker";
+import { Textarea } from "@/components/ui/textarea";
+import { AmountInput } from "@/components/AmountInput";
+import { convertAmountToMiliunits } from "@/lib/utils";
 
 const formSchema = z.object({
     date: z.coerce.date(),
@@ -54,8 +57,15 @@ export const TransactionForm = ({
     });
 
     const handleSubmit = (values: FormValues) => {
-        console.log({ values });
+        const amount = parseFloat(values.amount);
+        const amountInMiliunits = convertAmountToMiliunits(amount);
+
+        onSubmit({
+            ...values,
+            amount: amountInMiliunits
+        });
     }
+
 
     const handleDelete = () => {
         onDelete?.();
@@ -72,7 +82,9 @@ export const TransactionForm = ({
                         <FormItem>
                             <FormControl>
                                 <DatePicker
-
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    disabled={disabled}
                                 />
                             </FormControl>
                         </FormItem>
@@ -120,8 +132,64 @@ export const TransactionForm = ({
                         </FormItem>
                     )}
                 />
+                <FormField
+                    name="payee"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Payee
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    disabled={disabled}
+                                    placeholder="Add a payee"
+                                    {...field}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    name="amount"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Amount
+                            </FormLabel>
+                            <FormControl>
+                                <AmountInput
+                                    {...field}
+                                    disabled={disabled}
+                                    placeholder="0.00"
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    name="notes"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Notes
+                            </FormLabel>
+                            <FormControl>
+                                <Textarea
+                                    {...field}
+                                    value={field.value ?? ""}
+                                    disabled={disabled}
+                                    placeholder="Optional notes"
+
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
                 <Button className="w-full" disabled={disabled}>
-                    {id ? "Save changes" : "Create account"}
+                    {id ? "Save changes" : "Create transaction"}
                 </Button>
                 {!!id && (
                     <Button
@@ -132,7 +200,7 @@ export const TransactionForm = ({
                         className="w-full"
                     >
                         <Trash className="size-4 mr-2" />
-                        Delete account
+                        Delete transaction
                     </Button>
                 )}
             </form>
