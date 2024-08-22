@@ -3,7 +3,7 @@ import { convertAmountFromMiliunits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 
-export function useGetTransactions() {
+export function useGetSummary() {
     const params = useSearchParams();
     const from = params.get("from") || "";
     const to = params.get("to") || "";
@@ -11,18 +11,17 @@ export function useGetTransactions() {
 
     const query = useQuery({
         // TODO: check if params are needed in the query key
-        queryKey: ["transactions", { from , to, accountId }],
+        queryKey: ["summary", { from, to, accountId }],
         queryFn: async () => {
-            const res = await client.api.transactions.$get({
+            const res = await client.api.summary.$get({
                 query: {
                     to,
-                    from,
-                    accountId,
+
                 }
             });
 
             if (!res.ok) {
-                throw new Error("failed to fetch transactions");
+                throw new Error("failed to fetch summary");
             }
 
             const { data } = await res.json();
@@ -31,12 +30,24 @@ export function useGetTransactions() {
             // to convert api data to front end data
             // this is our MIDDLE layer so we do it here and the entire front
             // end has the correct data foramt
-            return data.map((transaction) => ({
-                ...transaction,
-                amount: convertAmountFromMiliunits(transaction.amount)
-            }))
-        },
+            return {
+                ...data,
+                incomeAmount: convertAmountFromMiliunits(data.incomeAmount),
+                expensesAmount: convertAmountFromMiliunits(data.expensesAmount),
+                remainingAmount: convertAmountFromMiliunits(data.remainingAmount),
+                categories: data.categories.map((category) => ({
+                    ...category,
+                    value: convertAmountFromMiliunits(category.value),
+                })),
+                days: data.days.map((day) => ({
+                    ...day,
+                    income: convertAmountFromMiliunits(day.income as number),
+                    expenses: convertAmountFromMiliunits(day.expenses as number),
+                }))
+            }
+        }
     });
     return query;
 }
+
 

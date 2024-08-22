@@ -3,6 +3,7 @@ import { handle } from "hono/vercel"
 import accounts from "./accounts";
 import categories from "./categories";
 import transactions from "./transactions";
+import summary from "./summary";
 
 export const runtime = "edge";
 
@@ -36,7 +37,8 @@ app
 const routes = app
     .route("/accounts", accounts)
     .route("/categories", categories)
-    .route("/transactions", transactions);
+    .route("/transactions", transactions)
+    .route("/summary", summary);
 
 
 // this overwrites the nextjs api route conventions allowing us to keep all routes
