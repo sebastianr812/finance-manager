@@ -16,6 +16,8 @@ export function useGetSummary() {
             const res = await client.api.summary.$get({
                 query: {
                     to,
+                    from,
+                    accountId
 
                 }
             });

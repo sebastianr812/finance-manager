@@ -3,6 +3,7 @@ import { HeaderLogo } from "./HeaderLogo";
 import { Navigation } from "./Navigation";
 import { Loader2 } from "lucide-react";
 import { WelcomeMsg } from "./WelcomeMsg";
+import { Filters } from "./Filters";
 
 export const Header = () => {
     return (
@@ -14,13 +15,14 @@ export const Header = () => {
                         <Navigation />
                     </div>
                     <ClerkLoaded>
-                        <UserButton afterSignOutUrl="/"/>
+                        <UserButton afterSignOutUrl="/" />
                     </ClerkLoaded>
                     <ClerkLoading>
-                        <Loader2 className="size-8 animate-spin text-slate-400"/>
+                        <Loader2 className="size-8 animate-spin text-slate-400" />
                     </ClerkLoading>
                 </div>
                 <WelcomeMsg />
+                <Filters />
             </div>
         </header>
     );
